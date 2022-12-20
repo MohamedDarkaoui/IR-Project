@@ -95,8 +95,9 @@ if __name__ == "__main__":
     results = search_by_emotions('clowns smoke weed', 12, em, 0, 'lexica2')
     results = [x for x in results]
     results = [x.to_dict() for x in results]
+
     results = json.dumps(results)
-    pprint.pprint(results)
+    pprint.pprint(json.loads(results))
     print("")
     # for hit in results:
     #     print(hit.meta.score, hit.text, hit.anger)

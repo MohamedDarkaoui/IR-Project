@@ -40,7 +40,8 @@ em = {
 """
 def init(api):
     api.add_resource(SearchByPrompt, "/api/normalsearch")
-    #api.add_resource(SearchByEmotionOrdered, "/api/emotionsearch")
+    api.add_resource(SearchByEmotionOrdered, "/api/emotionorderedsearch")
+    api.add_resource(SearchByEmotion, "/api/emotionsearch")
 
 
 
@@ -61,14 +62,14 @@ class SearchByPrompt(Resource):
 
         query = request.args.get('query')
         fuzziness = 2
-        res = fuzzy_search(query, 10, 'lexica2', False, fuzziness)
+        res = fuzzy_search(query, 50, 'lexica2', False, fuzziness)
         results = [x for x in res]
         results = [x.to_dict() for x in results]
         results = json.dumps(results)
-        return results, 200
+        return json.loads(results), 200
 
 
-class SearchByEmotionOrdered(Resource):
+class SearchByEmotion(Resource):
     def get(self):
         """
         Search by prompt
@@ -78,15 +79,51 @@ class SearchByEmotionOrdered(Resource):
           - in: query
             name: query
             description: prompt that you want to search
+          - in: emotions
+            name: emotions
+            description: emotions dictionary
         responses:
           200:
             description: Accepted
         """
 
         query = request.args.get('query')
-        emotion = request.args.get('emotion')
-        sort_by = request.args.get('sort_by')
-        res = search_by_emotions(query, 10, em, 2, 'lexica2', emotion)
+        emotions = request.args.get('emotions')
+        # http://127.0.0.1:5000/api/emotionsearch?query=clown&emotions={"anger":{"gte":0.5,"lte":1}}
+        print(emotions)
+        emotionsDict = json.loads(emotions)
+        res = search_by_emotions(query, 10, emotionsDict, 2, 'lexica2')
+        results = [x for x in res]
+        results = [x.to_dict() for x in results]
+        results = json.dumps(results)
+        return json.loads(results), 200
+
+class SearchByEmotionOrdered(Resource):
+    # best to sort in front end?
+    def get(self):
+        """
+        Search by prompt
+        ---
+        description: "Search relevant prompts and corresponding images only by prompts"
+        parameters:
+          - in: query
+            name: query
+            description: prompt that you want to search
+          - in: emotion
+            name: sorty_by
+            description: the emotion you want to sort by
+          - in: emotions
+            name: emotions
+            description: emotions dictionary
+        responses:
+          200:
+            description: Accepted
+        """
+
+        query = request.args.get('query')
+        sorty_by = request.args.get('sorty_by')
+        emotions = request.args.get('emotions')
+        res = search_by_emotions(query, 10, emotions, 2, 'lexica2', sorty_by)
         results = [x for x in res]
         results = [x.to_dict() for x in results]
         results = json.dumps(results)
