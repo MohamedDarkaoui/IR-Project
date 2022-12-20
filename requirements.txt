@@ -1,0 +1,5 @@
+flask==2.2.2
+flask_restful==0.3.9
+elasticsearch==8.5.3
+flasgger==0.9.5
+elasticsearch_dsl==7.4.0

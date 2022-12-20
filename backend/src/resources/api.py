@@ -44,6 +44,7 @@ def init(api):
     api.add_resource(SearchByEmotion, "/api/emotionsearch")
 
 
+INDEX="lexica"
 
 class SearchByPrompt(Resource):
     def get(self):
@@ -62,7 +63,7 @@ class SearchByPrompt(Resource):
 
         query = request.args.get('query')
         fuzziness = 2
-        res = fuzzy_search(query, 50, 'lexica2', False, fuzziness)
+        res = fuzzy_search(query, 50, INDEX, False, fuzziness)
         results = [x for x in res]
         results = [x.to_dict() for x in results]
         results = json.dumps(results)
@@ -92,7 +93,7 @@ class SearchByEmotion(Resource):
         # http://127.0.0.1:5000/api/emotionsearch?query=clown&emotions={"anger":{"gte":0.5,"lte":1}}
         print(emotions)
         emotionsDict = json.loads(emotions)
-        res = search_by_emotions(query, 10, emotionsDict, 2, 'lexica2')
+        res = search_by_emotions(query, 50, emotionsDict, 2, INDEX, "admiration")
         results = [x for x in res]
         results = [x.to_dict() for x in results]
         results = json.dumps(results)
@@ -123,7 +124,7 @@ class SearchByEmotionOrdered(Resource):
         query = request.args.get('query')
         sorty_by = request.args.get('sorty_by')
         emotions = request.args.get('emotions')
-        res = search_by_emotions(query, 10, emotions, 2, 'lexica2', sorty_by)
+        res = search_by_emotions(query, 10, emotions, 2, INDEX, sorty_by)
         results = [x for x in res]
         results = [x.to_dict() for x in results]
         results = json.dumps(results)

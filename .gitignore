@@ -1,2 +1,10 @@
 .idea/
 .idea
+data/lexica/ImageLinksFinal.txt
+data/glove/glove.6B.300d.txt
+results/data/BERT-labelled.csv
+results/data/cleanData.csv
+results/data/VGG16-labelled.csv
+src/preprocessing/go.sum
+backend/src/resources/__pycache__/api.cpython-39.pyc
+backend/src/search/__pycache__/search.cpython-39.pyc
