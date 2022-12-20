@@ -6,7 +6,7 @@ import json
 em = {
     "admiration": {'gte': 0, 'lte': 1},
     "amusement": {'gte': 0, 'lte': 1},
-    "anger": {'gte': 0.1, 'lte': 1},
+    "anger": {'gte': 0, 'lte': 1},
     "annoyance": {'gte': 0, 'lte': 1},
     "approval": {'gte': 0, 'lte': 1},
     "caring": {'gte': 0, 'lte': 1},
@@ -93,7 +93,7 @@ class SearchByEmotion(Resource):
         # http://127.0.0.1:5000/api/emotionsearch?query=clown&emotions={"anger":{"gte":0.5,"lte":1}}
         print(emotions)
         emotionsDict = json.loads(emotions)
-        res = search_by_emotions(query, 50, emotionsDict, 2, INDEX, "admiration")
+        res = search_by_emotions(query, 50, emotionsDict, 2, INDEX)
         results = [x for x in res]
         results = [x.to_dict() for x in results]
         results = json.dumps(results)

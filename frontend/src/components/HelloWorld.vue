@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="controls">
         <div class="search-container">
-                <button class="toggle" @click="showEmotions = !showEmotions">Emotions</button>
+                <button class="toggle" @click="showEmotions = !showEmotions">Emotions {{showEmotions ? '˄' : '˅'}}</button>
                 <input class="qinput" v-on:keyup.enter="search" type="text" v-model="q"/>
                 <button @click="search">Search</button>
         </div>
@@ -48,7 +48,7 @@ export default {
       emotions : {
           "admiration": {'gte': 0, 'lte': 1},
           "amusement": {'gte': 0, 'lte': 1},
-          "anger": {'gte': 0.1, 'lte': 1},
+          "anger": {'gte': 0, 'lte': 1},
           "annoyance": {'gte': 0, 'lte': 1},
           "approval": {'gte': 0, 'lte': 1},
           "caring": {'gte': 0, 'lte': 1},
