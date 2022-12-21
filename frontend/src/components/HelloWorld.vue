@@ -1,36 +1,120 @@
 <template>
   <div class="app-container">
-    <div class="controls">
+    <v-card elevation="2" class="controls">
         <div class="search-container">
-                <button class="toggle" @click="showEmotions = !showEmotions">Emotions {{showEmotions ? '˄' : '˅'}}</button>
+                <span>K</span>
+                <input class="K-select" type="number" v-model="K"/>
+                <v-btn
+                  class="mx-2"
+                  fab
+                  dark
+                  small
+                  large
+                  @click="showEmotions = !showEmotions"
+                  color="indigo"
+                >
+                  <v-icon dark>
+                    mdi-emoticon
+                  </v-icon>
+                </v-btn>
                 <input class="qinput" v-on:keyup.enter="search" type="text" v-model="q"/>
-                <button @click="search">Search</button>
+                <v-btn
+                  class="mx-2"
+                  fab
+                  dark
+                  small
+                  large
+                  @click="search"
+                  color="purple"
+                >
+                  <v-icon dark>
+                    mdi-magnify
+                  </v-icon>
+                </v-btn>
         </div>
+
         <div class="slider-container" v-show="showEmotions">
                 <div class="sliderwrap" v-for="(emotion, key) in emotions" :key="emotion">
                         <p>{{emotion['lte'].toFixed(2)}}</p>
                         <div class="slidbar"></div>
                         <p>{{emotion['gte'].toFixed(2)}}</p>
-                        <h>{{key}}</h>
+                        <h class="cursor-pointer">{{key}}</h>
                 </div>
         </div>
-
-    </div>
+    </v-card>
     <div class="display">
+        <div class="image-mason" v-if="searchResult">
+<!--        <div class="image-grid">-->
+<!--          <div v-for="result in searchResult" :key="result.text">-->
+<!--            <div class="container">-->
+<!--              <img class="image" v-bind:title="result.text"  :src="result.links[0]"/>-->
+<!--              <div class="overlay">-->
+<!--                <div class="text">{{result.text}}</div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
 
-        <div v-if="searchResult">
-        <div class="image-grid">
-          <div v-for="result in searchResult" :key="result.text">
-            <div class="container">
-              <img class="image" v-bind:title="result.text"  :src="result.links[0]"/>
-              <div class="overlay">
-                <div class="text">{{result.text}}</div>
-                </div>
-              </div>
-            </div>
-          </div>
+
+              <v-img v-for="result in searchResult" :key="result.text" class="ai-img" :src="result.links[0]" @click="dialog = true;image=result;">
+              </v-img>
+
+
+         <v-dialog
+            v-model="dialog"
+            content-class="elevation-0"
+            scrollable
+          >
+                 <v-card v-if="image !== null" dark>
+                    <div class="image-content">
+                      <div class="image-sidebar">
+                        <v-textarea
+                          outlined
+                          label="Prompt"
+                          :value="image.text"
+                          readonly
+                          no-resize
+                          rows="10"
+                        ></v-textarea>
+                        <v-textarea
+                          outlined
+                          label="Emotions"
+                          :value="ems"
+                          readonly
+                          no-resize
+                          rows="15"
+                        ></v-textarea>
+                      </div>
+                      <div class="image-carousel">
+                                <v-carousel height="auto" style="width:auto">
+                                  <v-carousel-item v-for="(link, i) in image.links" :key="i">
+                                    <div class="flex flex-row justify-center w-full">
+                                      <img class="big-image" :src="link"/>
+                                    </div>
+
+                                  </v-carousel-item>
+                              </v-carousel>
+                      </div>
+                    </div>
+                    <v-divider></v-divider>
+
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn
+                        color="primary"
+                        text
+                        @click="dialog = false"
+                      >
+                        Close
+                      </v-btn>
+                    </v-card-actions>
+                </v-card>
+          </v-dialog>
+
+
+
+
         </div>
-
     </div>
 
   </div>
@@ -77,7 +161,12 @@ export default {
       },
       q: '',
       searchResult: null,
-      showEmotions: true
+      showEmotions: true,
+      dialog: false,
+      image: null,
+      ems: "",
+      K:50,
+      selected_em: "",
     }
     
   },
@@ -88,6 +177,20 @@ export default {
       },
       set(value) {
         this[this.emotion] = value;
+      }
+    }
+  },
+   watch: {
+    // whenever question changes, this function will run
+    image(n, old) {
+      if (n !== null) {
+        this.ems = ""
+        for (const [key, value] of Object.entries(this.emotions)) {
+          let name = key.toString()
+          name = name.padEnd(30, ' ')
+          this.ems += name + " : " + this.image[key] +"\n";
+        }
+
       }
     }
   },
@@ -157,75 +260,34 @@ export default {
           }
         });
     }
+    setTimeout(()=>{
+      this.showEmotions = false;
+    }, 40)
 
   }
+
 }
 </script>
 
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-gap: 2px;
-}
-
-.container {
-  position: relative;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.image {
-  display: block;
-  width: 100%;
-  height: auto;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.overlay {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  width: 100%;
-  opacity: 0;
-  transition: .5s ease;
-}
-
-.container:hover .overlay {
-  opacity: 1;
-}
-
-.text {
-  color: white;
-  font-size: 30px;
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  text-align: center;
-  background-color: black;
-}
 
 .app-container{
   @apply
     flex
     flex-col
+    h-screen
 }
 .controls{
-  @apply flex flex-col flex-auto justify-center items-center mb-8
+  background: rgb(53,60,77);
+  background: radial-gradient(circle, rgba(76,86,110,1) 0%, rgba(53,60,77,1) 0%);
+  border-color: rgba(53,60,77,1) !important;
+  @apply flex flex-col flex-initial justify-center items-center py-4
 }
 
 .slider-container{
-  @apply flex flex-row justify-center flex-wrap mt-8
+  @apply flex flex-row justify-center flex-wrap mt-8 text-white
 }
 .sliderwrap{
   @apply basis-32 flex flex-col items-center
@@ -235,11 +297,35 @@ export default {
 }
 
 .qinput{
-  @apply text-2xl w-96 h-16 px-4 rounded-lg border-2
+  border-color: rgba(76,86,110,1) !important;
+  @apply text-2xl w-96 h-16 px-4 rounded-lg border-2 border-solid text-white
 }
-
-.search-container > button{
-  @apply rounded-xl p-4 bg-sky-600 text-white mx-4 text-xl
+.K-select{
+  border-color: rgba(76,86,110,1) !important;
+  @apply text-2xl w-24 px-4 rounded-lg border-2 border-solid text-white mr-4 ml-2
 }
-
+.search-container{
+  @apply flex flex-row justify-center items-center text-white text-2xl
+}
+.display{
+  @apply flex-auto overflow-y-auto
+}
+.image-mason{
+  @apply columns-7 gap-x-2 px-2 pt-2
+}
+.ai-img{
+  @apply mb-2 aspect-auto w-full rounded-md cursor-pointer hover:rounded-3xl hover:scale-105
+}
+.image-content{
+  @apply flex flex-row px-8 pt-4
+}
+.image-sidebar{
+  @apply basis-1/4 flex flex-col items-stretch
+}
+.image-carousel{
+  @apply flex-auto flex flex-row justify-center
+}
+.big-image{
+  @apply w-auto h-[80vh]
+}
 </style>
