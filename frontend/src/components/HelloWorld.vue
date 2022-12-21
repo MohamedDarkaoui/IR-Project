@@ -31,6 +31,8 @@
                     mdi-magnify
                   </v-icon>
                 </v-btn>
+                <span class="invisible">K</span>
+                <input class="invisible K-select" type="number"/>
         </div>
 
         <div class="slider-container" v-show="showEmotions">
@@ -38,27 +40,16 @@
                         <p>{{emotion['lte'].toFixed(2)}}</p>
                         <div class="slidbar"></div>
                         <p>{{emotion['gte'].toFixed(2)}}</p>
-                        <h class="cursor-pointer">{{key}}</h>
+                        <h @click="select(key)" class="cursor-pointer select-none"
+                           :class="{ 'selected-h': selected_em===key }">{{key}}</h>
                 </div>
         </div>
     </v-card>
     <div class="display">
         <div class="image-mason" v-if="searchResult">
-<!--        <div class="image-grid">-->
-<!--          <div v-for="result in searchResult" :key="result.text">-->
-<!--            <div class="container">-->
-<!--              <img class="image" v-bind:title="result.text"  :src="result.links[0]"/>-->
-<!--              <div class="overlay">-->
-<!--                <div class="text">{{result.text}}</div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-
 
               <v-img v-for="result in searchResult" :key="result.text" class="ai-img" :src="result.links[0]" @click="dialog = true;image=result;">
               </v-img>
-
 
          <v-dialog
             v-model="dialog"
@@ -201,7 +192,9 @@ export default {
       axios.get('/api/emotionsearch',{
         params:{
           query: this.q,
-          emotions: JSON.stringify(this.emotions)
+          emotions: JSON.stringify(this.emotions),
+          k : this.K,
+          selected: this.selected_em
         }
       })
       .then(responce => {
@@ -214,6 +207,14 @@ export default {
       .catch(error => {
         console.error(error)
       })
+    },
+    select(emotion){
+      if (this.selected_em===emotion){
+        this.selected_em = null;
+      }else{
+        this.selected_em = emotion
+      }
+      this.search();
     }
   },
   mounted(){
@@ -293,7 +294,7 @@ export default {
   @apply basis-32 flex flex-col items-center
 }
 .sliderwrap > h {
-  @apply font-bold
+  @apply font-semibold
 }
 
 .qinput{
@@ -327,5 +328,8 @@ export default {
 }
 .big-image{
   @apply w-auto h-[80vh]
+}
+.selected-h{
+  @apply text-rose-600
 }
 </style>

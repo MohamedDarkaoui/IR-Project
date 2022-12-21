@@ -90,10 +90,15 @@ class SearchByEmotion(Resource):
 
         query = request.args.get('query')
         emotions = request.args.get('emotions')
+        k = request.args.get('k')
+        selected = request.args.get('selected')
+        if selected == "":
+            selected = None
         # http://127.0.0.1:5000/api/emotionsearch?query=clown&emotions={"anger":{"gte":0.5,"lte":1}}
         print(emotions)
+        print(selected)
         emotionsDict = json.loads(emotions)
-        res = search_by_emotions(query, 50, emotionsDict, 2, INDEX)
+        res = search_by_emotions(query, k, emotionsDict, 2, INDEX, selected)
         results = [x for x in res]
         results = [x.to_dict() for x in results]
         results = json.dumps(results)

@@ -1,6 +1,6 @@
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
-es = Elasticsearch("https://localhost:9200", http_auth=("viktor", "viktor"), verify_certs=False)
+es = Elasticsearch("http://d082-2a02-1810-2801-7300-b5de-20cb-de21-4ede.eu.ngrok.io:80", http_auth=("viktor", "viktor"), verify_certs=False)
 
 em = {
     "admiration": {'gte': 0, 'lte': 1},
